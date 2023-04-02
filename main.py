@@ -1,5 +1,8 @@
+import smtplib
 import requests
 import selectorlib
+from os import getenv
+import ssl
 
 # the url of the website we want to scrape
 URL = "http://programmer100.pythonanywhere.com/tours/"
@@ -28,15 +31,30 @@ def extract(source):
     return value
 
 
-# send an email when there is upcoming tour
-def send_email():
+def send_email(extrac):
+    """Send an email when there is upcoming tour"""
+    host = "smtp.gmail.com"
+    port = 465
+
+    username = "test"
+    password = getenv("PASSWORD")
+
+    receiver = "test"
+    context = ssl.create_default_context()
+    message = ""
+    message = "Subject: Hey, new event was found!" + '\n' + \
+              message + f"{extrac}"
+
+    with smtplib.SMTP_SSL(host, port, context=context) as server:
+        server.login(username, password)
+        server.sendmail(username, receiver, message.encode("utf-8"))
     print("Email was sent!")
 
 
-def store(extracted):
+def store(extraction):
     """Stores the data in a txt file"""
     with open("data.txt", "a") as file:
-        file.write(extracted + "\n")
+        file.write(extraction + "\n")
 
 
 def read():
@@ -48,9 +66,11 @@ def read():
 if __name__ == "__main__":
     scraped = scrape(URL)
     extracted = extract(scraped)
+
     print(extracted)
     content = read()
+
     if extracted != "No upcoming tours":
         if extracted not in content:
             store(extracted)
-            send_email()
+            send_email(extracted)
