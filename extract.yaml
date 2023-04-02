@@ -1,0 +1,4 @@
+# tours is just a name we give to the yaml script, and it needs to be linked to the main script to extract an object
+tours:
+  # this is the id of the object we want to extract
+  css: '#displaytimer'
